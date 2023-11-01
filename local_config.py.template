@@ -24,6 +24,8 @@ devices = [
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
         "live_sync": True,
+        "device_punch_values_IN": [0, 4],
+        "device_punch_values_OUT": [1, 5],
     },
     {
         "device_id": "test_2",
@@ -31,6 +33,8 @@ devices = [
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
         "live_sync": False,
+        "device_punch_values_IN": [0, 4],
+        "device_punch_values_OUT": [1, 5],
     },
 ]
 
