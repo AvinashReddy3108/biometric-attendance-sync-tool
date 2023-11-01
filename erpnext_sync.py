@@ -103,7 +103,13 @@ def main():
                         str(datetime.datetime.now()),
                     )
                     if os.path.exists(dump_file):
-                        os.remove(dump_file)
+                        os.rename(
+                            dump_file,
+                            dump_file.replace(
+                                "_last_fetch_dump.json",
+                                f"_dump_{str(datetime.datetime.now())}.json",
+                            ),
+                        )
                     info_logger.info(
                         "Successfully processed Device: " + device["device_id"]
                     )
@@ -223,9 +229,7 @@ def pull_process_and_push_data(device, device_attendance_logs=None):
                     ]
                 )
             )
-            if all(
-                error not in erpnext_message for error in allowlisted_errors
-            ):
+            if all(error not in erpnext_message for error in allowlisted_errors):
                 raise Exception("API Call to ERPNext Failed.")
 
 
@@ -303,10 +307,7 @@ def live_sync_attendance(device):
                         ]
                     )
                 )
-                if all(
-                    error not in erpnext_message
-                    for error in allowlisted_errors
-                ):
+                if all(error not in erpnext_message for error in allowlisted_errors):
                     raise Exception("API Call to ERPNext Failed.")
     except Exception as e:
         print(f"Process terminate : {e}")
