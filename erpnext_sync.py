@@ -32,9 +32,10 @@ allowlisted_errors = [
 
 
 if hasattr(config, "allowed_exceptions"):
-    allowlisted_errors_temp = []
-    for error_number in config.allowed_exceptions:
-        allowlisted_errors_temp.append(allowlisted_errors[error_number - 1])
+    allowlisted_errors_temp = [
+        allowlisted_errors[error_number - 1]
+        for error_number in config.allowed_exceptions
+    ]
     allowlisted_errors = allowlisted_errors_temp
 
 device_punch_values_IN = getattr(config, "device_punch_values_IN", [0, 4])
@@ -76,18 +77,17 @@ def main():
                     )
                     continue
 
-                device_attendance_logs = None
                 info_logger.info("Processing Device: " + device["device_id"])
                 dump_file = get_dump_file_name_and_directory(
                     device["device_id"], device["ip"]
                 )
+                device_attendance_logs = None
                 if os.path.exists(dump_file):
                     info_logger.error(
                         "Device Attendance Dump Found in Log Directory. This can mean the program crashed unexpectedly. Retrying with dumped data."
                     )
                     with open(dump_file, "r") as f:
-                        file_contents = f.read()
-                        if file_contents:
+                        if file_contents := f.read():
                             device_attendance_logs = list(
                                 map(
                                     lambda x: _apply_function_to_key(
@@ -109,8 +109,7 @@ def main():
                     )
                 except:
                     error_logger.exception(
-                        "exception when calling pull_process_and_push_data function for device"
-                        + json.dumps(device, default=str)
+                        f"exception when calling pull_process_and_push_data function for device{json.dumps(device, default=str)}"
                     )
             if hasattr(config, "shift_type_device_mapping"):
                 update_shift_last_sync_timestamp(config.shift_type_device_mapping)
@@ -147,8 +146,8 @@ def pull_process_and_push_data(device, device_attendance_logs=None):
             device_id=device["device_id"],
             clear_from_device_on_fetch=device["clear_from_device_on_fetch"],
         )
-        if not device_attendance_logs:
-            return
+    if not device_attendance_logs:
+        return
     # for finding the last successfull push and restart from that point (or) from a set 'config.IMPORT_START_DATE' (whichever is later)
     index_of_last = -1
     last_line = get_last_line_from_file(
@@ -224,7 +223,9 @@ def pull_process_and_push_data(device, device_attendance_logs=None):
                     ]
                 )
             )
-            if not (any(error in erpnext_message for error in allowlisted_errors)):
+            if all(
+                error not in erpnext_message for error in allowlisted_errors
+            ):
                 raise Exception("API Call to ERPNext Failed.")
 
 
@@ -302,10 +303,13 @@ def live_sync_attendance(device):
                         ]
                     )
                 )
-                if not (any(error in erpnext_message for error in allowlisted_errors)):
+                if all(
+                    error not in erpnext_message
+                    for error in allowlisted_errors
+                ):
                     raise Exception("API Call to ERPNext Failed.")
     except Exception as e:
-        print("Process terminate : {}".format(e))
+        print(f"Process terminate : {e}")
     finally:
         if live_conn:
             live_conn.disconnect()
@@ -346,7 +350,7 @@ def get_all_attendance_from_device(
         x = conn.enable_device()
         info_logger.info("\t".join((ip, "Device Enable Attempted. Result:", str(x))))
     except:
-        error_logger.exception(str(ip) + " exception when fetching from device...")
+        error_logger.exception(f"{str(ip)} exception when fetching from device...")
         raise Exception("Device fetch failed.")
     finally:
         if conn:
@@ -361,10 +365,7 @@ def send_to_erpnext(employee_field_value, timestamp, device_id=None, log_type=No
     endpoint_app = "hrms" if ERPNEXT_VERSION > 13 else "erpnext"
     url = f"{config.ERPNEXT_URL}/api/method/{endpoint_app}.hr.doctype.employee_checkin.employee_checkin.add_log_based_on_employee_field"
     headers = {
-        "Authorization": "token "
-        + config.ERPNEXT_API_KEY
-        + ":"
-        + config.ERPNEXT_API_SECRET,
+        "Authorization": f"token {config.ERPNEXT_API_KEY}:{config.ERPNEXT_API_SECRET}",
         "Accept": "application/json",
     }
     data = {
@@ -376,36 +377,20 @@ def send_to_erpnext(employee_field_value, timestamp, device_id=None, log_type=No
     response = requests.request("POST", url, headers=headers, data=data)
     if response.status_code == 200:
         return 200, json.loads(response._content)["message"]["name"]
-    else:
-        error_str = _safe_get_error_str(response)
-        if EMPLOYEE_NOT_FOUND_ERROR_MESSAGE in error_str:
-            error_logger.error(
-                "\t".join(
-                    [
-                        "Error during ERPNext API Call.",
-                        str(employee_field_value),
-                        str(timestamp.timestamp()),
-                        str(device_id),
-                        str(log_type),
-                        error_str,
-                    ]
-                )
-            )
-            # TODO: send email?
-        else:
-            error_logger.error(
-                "\t".join(
-                    [
-                        "Error during ERPNext API Call.",
-                        str(employee_field_value),
-                        str(timestamp.timestamp()),
-                        str(device_id),
-                        str(log_type),
-                        error_str,
-                    ]
-                )
-            )
-        return response.status_code, error_str
+    error_str = _safe_get_error_str(response)
+    error_logger.error(
+        "\t".join(
+            [
+                "Error during ERPNext API Call.",
+                str(employee_field_value),
+                str(timestamp.timestamp()),
+                str(device_id),
+                str(log_type),
+                error_str,
+            ]
+        )
+    )
+    return response.status_code, error_str
 
 
 def update_shift_last_sync_timestamp(shift_type_device_mapping):
@@ -418,8 +403,8 @@ def update_shift_last_sync_timestamp(shift_type_device_mapping):
 
     """
     for shift_type_device_map in shift_type_device_mapping:
-        all_devices_pushed = True
         pull_timestamp_array = []
+        all_devices_pushed = True
         for device_id in shift_type_device_map["related_device_id"]:
             if not status.get(f"{device_id}_push_timestamp"):
                 all_devices_pushed = False
@@ -455,20 +440,16 @@ def update_shift_last_sync_timestamp(shift_type_device_mapping):
                             )
                 except:
                     error_logger.exception(
-                        "Exception in update_shift_last_sync_timestamp, for shift:"
-                        + shift
+                        f"Exception in update_shift_last_sync_timestamp, for shift:{shift}"
                     )
 
 
 def send_shift_sync_to_erpnext(shift_type_name, sync_timestamp):
-    url = config.ERPNEXT_URL + "/api/resource/Shift Type/" + shift_type_name
     headers = {
-        "Authorization": "token "
-        + config.ERPNEXT_API_KEY
-        + ":"
-        + config.ERPNEXT_API_SECRET,
+        "Authorization": f"token {config.ERPNEXT_API_KEY}:{config.ERPNEXT_API_SECRET}",
         "Accept": "application/json",
     }
+    url = f"{config.ERPNEXT_URL}/api/resource/Shift Type/{shift_type_name}"
     data = {"last_sync_of_checkin": str(sync_timestamp)}
     try:
         response = requests.request("PUT", url, headers=headers, data=json.dumps(data))
@@ -628,5 +609,5 @@ def quit(signo, _frame):
 
 if __name__ == "__main__":
     for sig in ("TERM", "HUP", "INT"):
-        signal.signal(getattr(signal, "SIG" + sig), quit)
+        signal.signal(getattr(signal, f"SIG{sig}"), quit)
     infinite_loop()
