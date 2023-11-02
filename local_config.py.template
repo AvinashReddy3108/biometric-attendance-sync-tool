@@ -23,18 +23,16 @@ devices = [
         "ip": "192.168.0.209",
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
-        "live_sync": True,
-        "device_punch_values_IN": [0, 4],
-        "device_punch_values_OUT": [1, 5],
+        "punch_values": {"IN": [0, 4], "OUT": [1, 5]},
+        "live_sync": True
     },
     {
         "device_id": "test_2",
         "ip": "192.168.2.209",
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
-        "live_sync": False,
-        "device_punch_values_IN": [0, 4],
-        "device_punch_values_OUT": [1, 5],
+        "punch_values": {"IN": [0, 4], "OUT": [1, 5]},
+        "live_sync": False
     },
 ]
 

@@ -38,8 +38,6 @@ if hasattr(config, "allowed_exceptions"):
     ]
     allowlisted_errors = allowlisted_errors_temp
 
-device_punch_values_IN = getattr(config, "device_punch_values_IN", [0, 4])
-device_punch_values_OUT = getattr(config, "device_punch_values_OUT", [1, 5])
 ERPNEXT_VERSION = getattr(config, "ERPNEXT_VERSION", 13)
 
 
@@ -189,9 +187,9 @@ def pull_process_and_push_data(device, device_attendance_logs=None):
     for device_attendance_log in device_attendance_logs[index_of_last + 1 :]:
         punch_direction = device["punch_direction"]
         if punch_direction == "AUTO":
-            if device_attendance_log["punch"] in device_punch_values_OUT:
+            if device_attendance_log["punch"] in device["punch_values"]["OUT"]:
                 punch_direction = "OUT"
-            elif device_attendance_log["punch"] in device_punch_values_IN:
+            elif device_attendance_log["punch"] in device["punch_values"]["IN"]:
                 punch_direction = "IN"
             else:
                 punch_direction = None
@@ -267,9 +265,9 @@ def live_sync_attendance(device):
             print(device_attendance_log)
             punch_direction = device["punch_direction"]
             if punch_direction == "AUTO":
-                if device_attendance_log["punch"] in device_punch_values_OUT:
+                if device_attendance_log["punch"] in device["punch_values"]["OUT"]:
                     punch_direction = "OUT"
-                elif device_attendance_log["punch"] in device_punch_values_IN:
+                elif device_attendance_log["punch"] in device["punch_values"]["IN"]:
                     punch_direction = "IN"
                 else:
                     punch_direction = None
