@@ -105,7 +105,7 @@ def main():
                             dump_file,
                             dump_file.replace(
                                 "_last_fetch_dump.json",
-                                f"_dump_{str(datetime.datetime.now())}.json",
+                                f"_last_fetch_dump_backup.json",
                             ),
                         )
                     info_logger.info(
@@ -251,9 +251,9 @@ def live_sync_attendance(device):
     )
 
     try:
-        print(f"[Live Sync]Connecting to {device['device_id']}")
+        print(f"[Live Sync] Connecting to {device['device_id']}")
         live_conn = live_zk.connect()
-        print(f"[Live Sync]Connected to {device['device_id']}")
+        print(f"[Live Sync] Connected to {device['device_id']}")
         for attendance in live_conn.live_capture():
             if exit.is_set():
                 break
