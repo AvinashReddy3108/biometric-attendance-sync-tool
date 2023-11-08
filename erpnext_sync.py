@@ -101,7 +101,7 @@ def main():
                         str(datetime.datetime.now()),
                     )
                     if os.path.exists(dump_file):
-                        os.rename(
+                        os.replace(
                             dump_file,
                             dump_file.replace(
                                 "_last_fetch_dump.json",
