@@ -105,7 +105,7 @@ def main():
                             dump_file,
                             dump_file.replace(
                                 "_last_fetch_dump.json",
-                                f"_last_fetch_dump_backup.json",
+                                "_last_fetch_dump_backup.json",
                             ),
                         )
                     info_logger.info(
