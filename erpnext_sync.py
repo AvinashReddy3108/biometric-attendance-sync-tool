@@ -38,7 +38,7 @@ if hasattr(config, "allowed_exceptions"):
     ]
     allowlisted_errors = allowlisted_errors_temp
 
-ERPNEXT_VERSION = getattr(config, "ERPNEXT_VERSION", 13)
+ERPNEXT_VERSION = getattr(config, "ERPNEXT_VERSION", 14)
 
 
 # Notes:
