@@ -14,9 +14,10 @@ IMPORT_START_DATE = None  # format: '20190501'
 # - device_id - must be unique, strictly alphanumerical chars only. no space allowed.
 # - ip - device IP Address
 # - punch_direction - 'IN'/'OUT'/'AUTO'/None
+# - punch_values - define the IN/OUT punch values (refer your device manual/settings)
 # - clear_from_device_on_fetch: if set to true then attendance is deleted after fetch is successful.
-# (Caution: this feature can lead to data loss if used carelessly.)
-# - live_sync - whether or not checkin should be fetch
+#   (Caution: this feature can lead to data loss if used carelessly.)
+# - live_sync - whether or not checkin should be fetched in real time (does not pull past checkins from "IMPORT_START_DATE")
 devices = [
     {
         "device_id": "test_1",
@@ -24,7 +25,7 @@ devices = [
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
         "punch_values": {"IN": [0, 4], "OUT": [1, 5]},
-        "live_sync": True
+        "live_sync": False
     },
     {
         "device_id": "test_2",
@@ -32,7 +33,7 @@ devices = [
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
         "punch_values": {"IN": [0, 4], "OUT": [1, 5]},
-        "live_sync": False
+        "live_sync": True
     },
 ]
 
