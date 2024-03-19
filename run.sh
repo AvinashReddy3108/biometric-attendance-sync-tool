@@ -24,7 +24,7 @@ Restart=always
 KillMode=process
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
 EOF
 
 # Run
