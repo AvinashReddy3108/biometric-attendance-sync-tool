@@ -22,6 +22,7 @@ devices = [
     {
         "device_id": "test_1",
         "ip": "192.168.0.209",
+        "port": 4370, # optional, default is 4370
         "punch_direction": None,
         "clear_from_device_on_fetch": False,
         "punch_values": {"IN": [0, 4], "OUT": [1, 5]},
