@@ -377,7 +377,7 @@ def send_to_erpnext(employee_field_value, timestamp, device_id=None, log_type=No
         "device_id": device_id,
         "log_type": log_type,
     }
-    response = requests.request("POST", url, headers=headers, json=data)
+    response = requests.request("POST", url, headers=headers, json=data, verify=False)
     if response.status_code == 200:
         return 200, json.loads(response._content)["message"]["name"]
     error_str = _safe_get_error_str(response)
@@ -455,7 +455,7 @@ def send_shift_sync_to_erpnext(shift_type_name, sync_timestamp):
     url = f"{config.ERPNEXT_URL}/api/resource/Shift Type/{shift_type_name}"
     data = {"last_sync_of_checkin": str(sync_timestamp)}
     try:
-        response = requests.request("PUT", url, headers=headers, data=json.dumps(data))
+        response = requests.request("PUT", url, headers=headers, data=json.dumps(data), verify=False)
         if response.status_code == 200:
             info_logger.info(
                 "\t".join(
