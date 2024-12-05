@@ -194,7 +194,7 @@ def pull_process_and_push_data(device, device_attendance_logs=None):
             else:
                 punch_direction = None
         erpnext_status_code, erpnext_message = send_to_erpnext(
-            device_attendance_log["user_id"],
+            device["user_id_template"].format(user_id=device_attendance_log["user_id"]),
             device_attendance_log["timestamp"],
             device["device_id"],
             punch_direction,
@@ -455,7 +455,9 @@ def send_shift_sync_to_erpnext(shift_type_name, sync_timestamp):
     url = f"{config.ERPNEXT_URL}/api/resource/Shift Type/{shift_type_name}"
     data = {"last_sync_of_checkin": str(sync_timestamp)}
     try:
-        response = requests.request("PUT", url, headers=headers, data=json.dumps(data), verify=False)
+        response = requests.request(
+            "PUT", url, headers=headers, data=json.dumps(data), verify=False
+        )
         if response.status_code == 200:
             info_logger.info(
                 "\t".join(
